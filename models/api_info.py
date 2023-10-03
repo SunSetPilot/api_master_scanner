@@ -14,5 +14,3 @@ class ApiInfo:
     path: str
     method: str
     params: List[ApiParamsInfo]
-    repo_url: str
-    repo_branch: str
