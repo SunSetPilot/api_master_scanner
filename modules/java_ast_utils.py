@@ -2,7 +2,8 @@ import os
 import javalang
 from typing import List
 
-from models.api_info import ApiInfo, ApiParamsInfo
+from models.api_info import ApiInfo
+from modules.public_utils import md5
 from javalang.tree import CompilationUnit, ClassDeclaration, MethodDeclaration
 
 
@@ -75,14 +76,18 @@ class JavaAstUtils(object):
         api_info = ApiInfo(
             path="",
             method="",
-            params=[]
+            hash="",
+            header_params={},
+            query_params={},
+            body_params="",
+            response=""
         )
         for annotation in method.annotations:
             if annotation.name.endswith("Mapping"):
                 api_info.method = annotation.name.replace("Mapping", "").upper()
                 api_info.path = annotation.children[1].value.strip("\"")
                 break
-        # todo get params
+        api_info.hash = md5(f"{api_info.path}{api_info.method}")
         return api_info
 
     @staticmethod
@@ -99,26 +104,14 @@ class JavaAstUtils(object):
                 break
 
         api_info_list = []
+        api_hash_set = set()
         for method in controller.methods:
             if JavaAstUtils.__is_api_method(method):
                 api_info = JavaAstUtils.get_api_info(method)
                 api_info.path = f"{base_path}{api_info.path}"
-                api_info_list.append(api_info)
+                if api_info.hash in api_hash_set:
+                    continue
+                else:
+                    api_hash_set.add(api_info.hash)
+                    api_info_list.append(api_info)
         return api_info_list
-
-
-if __name__ == '__main__':
-    from modules.git import git_manager
-    project_path = git_manager.get_repo("git@github.com:PlayEdu/PlayEdu.git", "main")
-    java_files = JavaAstUtils.get_all_java_files(project_path)
-    for file in java_files:
-        try:
-            ast = JavaAstUtils.get_java_file_ast(file)
-        except Exception:
-            continue
-        for path, node in ast:
-            if isinstance(node, ClassDeclaration):
-                if JavaAstUtils.is_controller(node):
-                    api_info_list = JavaAstUtils.get_api_info_list(node)
-                    for api_info in api_info_list:
-                        print(api_info)

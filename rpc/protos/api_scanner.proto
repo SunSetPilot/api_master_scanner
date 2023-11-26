@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package com.coderalliance.apimaster.service.rpc;
+
+message ScanApiRequest {
+  int64 project_id = 1;
+  string git_address = 2;
+  string git_branch = 3;
+}
+
+message ScanApiResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+service ScanApiService {
+  rpc Scan(ScanApiRequest) returns (ScanApiResponse);
+}

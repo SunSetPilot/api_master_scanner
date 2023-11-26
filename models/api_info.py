@@ -1,16 +1,12 @@
 from dataclasses import dataclass
-from typing import List
-
-
-@dataclass
-class ApiParamsInfo:
-    name: str
-    type: str
-    position: int
 
 
 @dataclass
 class ApiInfo:
     path: str
     method: str
-    params: List[ApiParamsInfo]
+    hash: str
+    header_params: dict
+    query_params: dict
+    body_params: str
+    response: str
