@@ -20,7 +20,7 @@ class Logger(logging.Logger):
                 project_name=config.settings.project_name
             )
         else:
-            logger_file = "/data/logs/{project_name}.log".format(project_name=config.settings.project_name)
+            logger_file = "/tmp/logs/{project_name}.log".format(project_name=config.settings.project_name)
 
         # 创建日志文件
         logging.Logger.__init__(self, logger_file)
